@@ -103,7 +103,19 @@ require("lazy").setup({
     "nvim-tree/nvim-tree.lua",
     dependencies = { "nvim-tree/nvim-web-devicons" },
     config = function()
+      local function on_attach(bufnr)
+        local api = require('nvim-tree.api')
+        
+        -- Default mappings
+        api.config.mappings.default_on_attach(bufnr)
+        
+        -- Custom mapping
+        vim.keymap.set("n", ".", function()
+          api.tree.change_root_to_node()
+        end, { buffer = bufnr, desc = "NvimTree: Focus folder" })
+      end
       require("nvim-tree").setup({
+        on_attach = on_attach,
         view = { width = 35 },
         filters = { dotfiles = false },
         git = { enable = true },
@@ -145,7 +157,17 @@ require("lazy").setup({
           lualine_a = {'mode'},
           lualine_b = {'branch', 'diff', 'diagnostics'},
           lualine_c = {'filename'},
-          lualine_x = {'encoding', 'fileformat', 'filetype'},
+          lualine_x = {
+            {
+              function()
+                return os.date('%a | %d-%m-%Y | %H:%M')
+              end,
+              icon = ''
+            },
+            'encoding', 
+            'fileformat', 
+            'filetype'
+          },
           lualine_y = {'progress'},
           lualine_z = {'location'}
         },
@@ -442,7 +464,7 @@ km("n", "<leader>e", ":NvimTreeFocus<CR>", vim.tbl_extend("force", opts, { desc 
 
 -- Telescope
 km("n", "<C-p>", ":Telescope find_files<CR>", vim.tbl_extend("force", opts, { desc = "Find files" }))
-km("n", "<C-S-f>", ":Telescope live_grep<CR>", vim.tbl_extend("force", opts, { desc = "Search in files" }))
+km("n", "<leader>sf", ":Telescope live_grep<CR>", vim.tbl_extend("force", opts, { desc = "Search in files" }))
 km("n", "<leader>fb", ":Telescope buffers<CR>", vim.tbl_extend("force", opts, { desc = "Buffers" }))
 km("n", "<leader>fh", ":Telescope help_tags<CR>", vim.tbl_extend("force", opts, { desc = "Help" }))
 km("n", "<leader>fg", ":Telescope git_files<CR>", vim.tbl_extend("force", opts, { desc = "Git files" }))
@@ -484,8 +506,8 @@ km("n", "<C-z>", "u", opts)
 km("n", "<C-y>", "<C-r>", opts)
 
 -- Terminal
-km("n", "<C-`>", ":ToggleTerm<CR>", opts)
-km("t", "<C-`>", "<C-\\><C-n>:ToggleTerm<CR>", opts)
+km("n", "<C-\\>", ":ToggleTerm<CR>", opts)
+km("t", "<C-\\>", "<C-\\><C-n>:ToggleTerm<CR>", opts)
 km("t", "<Esc>", "<C-\\><C-n>", opts)
 
 -- Toggle diagnostics
