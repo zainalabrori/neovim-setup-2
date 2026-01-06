@@ -4,7 +4,7 @@
 local config = {
   theme = "vscode", -- Options: "vscode", "tokyonight", "catppuccin", "gruvbox"
   silent_mode = false, -- Set true to disable startup messages
-  auto_format_xml = true, -- Auto-format XML on save
+  auto_format_xml = false, -- Auto-format XML on save
 }
 
 -- =========================
@@ -266,7 +266,8 @@ require("lazy").setup({
           km("n", "<leader>rn", vim.lsp.buf.rename, opts)
           km("n", "<leader>ca", vim.lsp.buf.code_action, opts)
           km("n", "gr", vim.lsp.buf.references, opts)
-          km("n", "<C-k>", vim.lsp.buf.signature_help, opts)
+          km("n", "<leader>k", vim.lsp.buf.signature_help, opts)
+          km("i", "<C-k>", vim.lsp.buf.signature_help, opts)
           km("n", "gl", vim.diagnostic.open_float, opts)
           km("n", "[d", vim.diagnostic.goto_prev, opts)
           km("n", "]d", vim.diagnostic.goto_next, opts)
@@ -477,6 +478,8 @@ km("n", "<leader>2", ":BufferLineGoToBuffer 2<CR>", opts)
 km("n", "<leader>3", ":BufferLineGoToBuffer 3<CR>", opts)
 km("n", "<leader>4", ":BufferLineGoToBuffer 4<CR>", opts)
 km("n", "<leader>5", ":BufferLineGoToBuffer 5<CR>", opts)
+km("n", "<leader>bx", ":%bd|e#|bd#<CR>", { desc = "Close all buffers except current" })
+km("n", "<leader>ba", ":%bd<CR>", { desc = "Close all buffers" })
 
 -- Split navigation
 km("n", "<C-h>", "<C-w>h", opts)
@@ -509,6 +512,18 @@ km("n", "<C-y>", "<C-r>", opts)
 km("n", "<C-\\>", ":ToggleTerm<CR>", opts)
 km("t", "<C-\\>", "<C-\\><C-n>:ToggleTerm<CR>", opts)
 km("t", "<Esc>", "<C-\\><C-n>", opts)
+
+-- Split screen
+km("n", "<leader>sv", ":vsplit<CR>", { desc = "Split vertical" })
+km("n", "<leader>sh", ":split<CR>", { desc = "Split horizontal" })
+km("n", "<leader>sx", ":close<CR>", { desc = "Close split" })
+km("n", "<leader>se", "<C-w>=", { desc = "Equal split size" })
+
+-- Resize splits
+km("n", "<C-Up>", ":resize +2<CR>", opts)
+km("n", "<C-Down>", ":resize -2<CR>", opts)
+km("n", "<C-Left>", ":vertical resize -2<CR>", opts)
+km("n", "<C-Right>", ":vertical resize +2<CR>", opts)
 
 -- Toggle diagnostics
 km("n", "<leader>td", function()
@@ -548,13 +563,6 @@ vim.api.nvim_create_autocmd("FileType", {
     vim.opt_local.tabstop = 4
     vim.opt_local.expandtab = true
     
-    local buf_km = vim.keymap.set
-    buf_km("n", "<leader>oi", "i from odoo import models, fields, api<Esc>", 
-      { buffer = true, desc = "Odoo imports" })
-    buf_km("n", "<leader>om", "iclass <C-r>=expand('%:t:r')<CR>(models.Model):<CR>_name = ''<Esc>hi", 
-      { buffer = true, desc = "Odoo model" })
-    buf_km("n", "<leader>of", "i= fields.<Esc>", 
-      { buffer = true, desc = "Odoo field" })
   end,
 })
 
@@ -568,12 +576,6 @@ vim.api.nvim_create_autocmd("FileType", {
     
     vim.cmd([[syntax match odooDirective /t-\w\+/]])
     vim.cmd([[highlight link odooDirective Keyword]])
-    
-    local buf_km = vim.keymap.set
-    buf_km("n", "<leader>or", "i<record id=\"\" model=\"\"><CR></record><Esc>", 
-      { buffer = true, desc = "Odoo record" })
-    buf_km("n", "<leader>ov", "i<field name=\"arch\" type=\"xml\"><CR></field><Esc>", 
-      { buffer = true, desc = "Odoo view arch" })
     
     -- Auto-format XML on save
     if config.auto_format_xml then
